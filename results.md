@@ -63,3 +63,13 @@ Observations (initial quick run on Wikitext-2 small subset):
 - Test perplexity: baseline=46.925, mixed=46.972 (Δ=+0.047)
 - Test token_acc: baseline=0.327, mixed=0.328 (Δ=+0.001)
 - Takeaway: Still parity on CE metrics after longer training; pursue semantic proxy metrics and out-of-domain tests next.
+
+
+## Run: runs/mixed_wt2_semcheck
+- Model: distilgpt2
+- Dataset: wikitext / wikitext-2-raw-v1 (field: text)
+- Block size: 256 | Alpha: 0.5 | Temp: 1.0 | TopK: 256
+- Train steps: 15 | Epochs: 1.0 | LR: 5e-05 | BS train/eval: 2/2
+- Eval metrics: {"eval_loss": 2.1199021339416504, "eval_ce_loss": 3.8920490741729736, "eval_perplexity": 49.01121139526367, "eval_token_acc": 0.33130493576741044, "eval_runtime": 15.0002, "eval_samples_per_second": 1.933, "eval_steps_per_second": 1.0, "epoch": 1.0}
+- Test metrics: {"eval_loss": 2.2489490509033203, "eval_ce_loss": 4.134416103363037, "eval_perplexity": 62.4531135559082, "eval_token_acc": 0.2873303167420814, "eval_runtime": 15.6518, "eval_samples_per_second": 1.661, "eval_steps_per_second": 0.831, "epoch": 1.0}
+- Semantic (SBERT): {"sbert_model": "sentence-transformers/all-MiniLM-L6-v2", "sbert_cosine_mean": 0.46476972103118896, "sbert_cosine_all": [0.31499508023262024, 0.46374642848968506, 0.386816143989563, 0.7131074666976929, 0.1712658405303955, 0.5953035950660706, 0.55072021484375, 0.5270653367042542, 0.3771056830883026, 0.5475714206695557]}
