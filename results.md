@@ -38,3 +38,12 @@ Observations (initial quick run on Wikitext-2 small subset):
 - Test perplexity: baseline=60.186, mixed=60.203 (Δ=+0.017)
 - Test token_acc: baseline=0.293, mixed=0.294 (Δ=+0.001)
 - Takeaway: On this tiny run, CE metrics are essentially equal; need more data/seeds to conclude.
+
+
+## Run: runs/baseline_wt2_longer
+- Model: distilgpt2
+- Dataset: wikitext / wikitext-2-raw-v1 (field: text)
+- Block size: 256 | Alpha: 0.0 | Temp: 1.0 | TopK: None
+- Train steps: 192 | Epochs: 2.0 | LR: 5e-05 | BS train/eval: 2/2
+- Eval metrics: {"eval_loss": 3.6034348011016846, "eval_ce_loss": 3.603400707244873, "eval_perplexity": 36.72290802001953, "eval_token_acc": 0.3608543417366947, "eval_runtime": 92.605, "eval_samples_per_second": 0.605, "eval_steps_per_second": 0.302, "epoch": 2.0}
+- Test metrics: {"eval_loss": 3.8485865592956543, "eval_ce_loss": 3.848552703857422, "eval_perplexity": 46.92509841918945, "eval_token_acc": 0.32727272727272727, "eval_runtime": 130.4711, "eval_samples_per_second": 0.506, "eval_steps_per_second": 0.253, "epoch": 2.0}

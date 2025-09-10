@@ -1,0 +1,60 @@
+{
+  "args": {
+    "model_name": "distilgpt2",
+    "dataset_name": "wikitext",
+    "dataset_config_name": "wikitext-2-raw-v1",
+    "text_field": "text",
+    "subset_train": 300,
+    "subset_val": 100,
+    "subset_test": 100,
+    "block_size": 256,
+    "alpha": 0.0,
+    "temperature": 1.0,
+    "cos_topk": null,
+    "per_device_train_batch_size": 2,
+    "per_device_eval_batch_size": 2,
+    "num_train_epochs": 2.0,
+    "learning_rate": 5e-05,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.03,
+    "gradient_accumulation_steps": 1,
+    "output_dir": "runs/baseline_wt2_longer",
+    "from_scratch": false,
+    "seed": 42,
+    "fp16": false,
+    "eval_strategy": "epoch",
+    "logging_steps": 50,
+    "save_total_limit": 1,
+    "min_chars": 128,
+    "sample_generations": 0,
+    "generation_max_new_tokens": 64
+  },
+  "eval": {
+    "eval_loss": 3.6034348011016846,
+    "eval_ce_loss": 3.603400707244873,
+    "eval_perplexity": 36.72290802001953,
+    "eval_token_acc": 0.3608543417366947,
+    "eval_runtime": 92.605,
+    "eval_samples_per_second": 0.605,
+    "eval_steps_per_second": 0.302,
+    "epoch": 2.0
+  },
+  "test": {
+    "eval_loss": 3.8485865592956543,
+    "eval_ce_loss": 3.848552703857422,
+    "eval_perplexity": 46.92509841918945,
+    "eval_token_acc": 0.32727272727272727,
+    "eval_runtime": 130.4711,
+    "eval_samples_per_second": 0.506,
+    "eval_steps_per_second": 0.253,
+    "epoch": 2.0
+  },
+  "train": {
+    "train_runtime": 122.1538,
+    "train_samples_per_second": 3.144,
+    "train_steps_per_second": 1.572,
+    "total_flos": 25084488056832.0,
+    "train_loss": 3.823209842046102,
+    "epoch": 2.0
+  }
+}
