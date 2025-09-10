@@ -52,6 +52,9 @@ class Args:
     min_chars: int
     sample_generations: int
     generation_max_new_tokens: int
+    semantic_eval_samples: int
+    semantic_metric: str
+    sbert_model: str
 
 
 def parse_args() -> Args:
@@ -84,6 +87,9 @@ def parse_args() -> Args:
     p.add_argument("--min_chars", type=int, default=128)
     p.add_argument("--sample_generations", type=int, default=0, help="number of val samples to generate")
     p.add_argument("--generation_max_new_tokens", type=int, default=64)
+    p.add_argument("--semantic_eval_samples", type=int, default=0, help="number of val samples for semantic eval")
+    p.add_argument("--semantic_metric", default="sbert", choices=["sbert", "none"], help="semantic metric to compute on generations")
+    p.add_argument("--sbert_model", default="sentence-transformers/all-MiniLM-L6-v2")
     a = p.parse_args()
     return Args(**vars(a))
 
@@ -306,16 +312,6 @@ def main():
     except Exception:
         test_metrics = {}
 
-    # Persist metrics
-    metrics = {
-        "args": vars(args),
-        "eval": eval_metrics,
-        "test": test_metrics,
-        "train": {k: float(v) if isinstance(v, (int, float)) else v for k, v in train_result.metrics.items()},
-    }
-    with open(os.path.join(args.output_dir, "metrics.json"), "w") as f:
-        json.dump(metrics, f, indent=2)
-
     # Optional: sample generations from validation set
     gens = []
     if args.sample_generations > 0 and len(lm_ds["validation"]) > 0:
@@ -345,6 +341,58 @@ def main():
         with open(os.path.join(args.output_dir, "generations.json"), "w") as f:
             json.dump(gens, f, indent=2)
 
+    # Optional: semantic evaluation using SBERT on generated continuations vs gold
+    semantic = {}
+    if args.semantic_metric == "sbert" and args.semantic_eval_samples > 0 and len(lm_ds["validation"]) > 0:
+        try:
+            from sentence_transformers import SentenceTransformer, util
+
+            model.eval()
+            sbert = SentenceTransformer(args.sbert_model)
+            rng = random.Random(args.seed)
+            indices = [rng.randrange(0, len(lm_ds["validation"])) for _ in range(args.semantic_eval_samples)]
+            preds, refs = [], []
+            for idx in indices:
+                item = lm_ds["validation"][idx]
+                input_ids_full = item["input_ids"]
+                split = max(1, len(input_ids_full) // 2)
+                prompt_ids = input_ids_full[:split]
+                gold_ids = input_ids_full[split: split + args.generation_max_new_tokens]
+                prompt = torch.tensor([prompt_ids], device=model.device)
+                with torch.no_grad():
+                    out = model.generate(
+                        input_ids=prompt,
+                        max_new_tokens=len(gold_ids) if len(gold_ids) > 0 else args.generation_max_new_tokens,
+                        do_sample=True,
+                        temperature=0.9,
+                        top_k=50,
+                        pad_token_id=tokenizer.pad_token_id,
+                        eos_token_id=tokenizer.eos_token_id,
+                    )
+                gen_text = tokenizer.decode(out[0][len(prompt_ids):], skip_special_tokens=True)
+                ref_text = tokenizer.decode(gold_ids, skip_special_tokens=True)
+                preds.append(gen_text)
+                refs.append(ref_text)
+
+            emb_pred = sbert.encode(preds, convert_to_tensor=True, show_progress_bar=False)
+            emb_ref = sbert.encode(refs, convert_to_tensor=True, show_progress_bar=False)
+            from torch.nn import functional as Fnn
+            cos = Fnn.cosine_similarity(emb_pred, emb_ref).cpu().numpy().tolist()
+            semantic = {"sbert_model": args.sbert_model, "sbert_cosine_mean": float(sum(cos) / max(1, len(cos))), "sbert_cosine_all": cos}
+        except Exception as e:
+            semantic = {"error": str(e)}
+
+    # Persist metrics (now including optional semantic)
+    metrics = {
+        "args": vars(args),
+        "eval": eval_metrics,
+        "test": test_metrics,
+        "train": {k: float(v) if isinstance(v, (int, float)) else v for k, v in train_result.metrics.items()},
+        "semantic": semantic,
+    }
+    with open(os.path.join(args.output_dir, "metrics.json"), "w") as f:
+        json.dump(metrics, f, indent=2)
+
     # Append to results.md for quick tracking
     results_path = os.path.join(os.getcwd(), "results.md")
     with open(results_path, "a") as rf:
@@ -364,6 +412,8 @@ def main():
             rf.write("- Test metrics: {}\n".format(json.dumps(test_metrics)))
         if gens:
             rf.write("- Sample generations saved to {}/generations.json\n".format(args.output_dir))
+        if semantic:
+            rf.write("- Semantic (SBERT): {}\n".format(json.dumps(semantic)))
 
 
 if __name__ == "__main__":
