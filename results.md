@@ -47,3 +47,19 @@ Observations (initial quick run on Wikitext-2 small subset):
 - Train steps: 192 | Epochs: 2.0 | LR: 5e-05 | BS train/eval: 2/2
 - Eval metrics: {"eval_loss": 3.6034348011016846, "eval_ce_loss": 3.603400707244873, "eval_perplexity": 36.72290802001953, "eval_token_acc": 0.3608543417366947, "eval_runtime": 92.605, "eval_samples_per_second": 0.605, "eval_steps_per_second": 0.302, "epoch": 2.0}
 - Test metrics: {"eval_loss": 3.8485865592956543, "eval_ce_loss": 3.848552703857422, "eval_perplexity": 46.92509841918945, "eval_token_acc": 0.32727272727272727, "eval_runtime": 130.4711, "eval_samples_per_second": 0.506, "eval_steps_per_second": 0.253, "epoch": 2.0}
+
+
+## Run: runs/mixed_wt2_longer_a05
+- Model: distilgpt2
+- Dataset: wikitext / wikitext-2-raw-v1 (field: text)
+- Block size: 256 | Alpha: 0.5 | Temp: 1.0 | TopK: 256
+- Train steps: 192 | Epochs: 2.0 | LR: 5e-05 | BS train/eval: 2/2
+- Eval metrics: {"eval_loss": 1.9662392139434814, "eval_ce_loss": 3.604022264480591, "eval_perplexity": 36.7457389831543, "eval_token_acc": 0.3600140056022409, "eval_runtime": 83.3026, "eval_samples_per_second": 0.672, "eval_steps_per_second": 0.336, "epoch": 2.0}
+- Test metrics: {"eval_loss": 2.0960004329681396, "eval_ce_loss": 3.849557638168335, "eval_perplexity": 46.9722785949707, "eval_token_acc": 0.3282828282828283, "eval_runtime": 85.0767, "eval_samples_per_second": 0.776, "eval_steps_per_second": 0.388, "epoch": 2.0}
+
+## Longer Run (2 epochs, 300/100/100 docs)
+- Val perplexity: baseline=36.723, mixed=36.746 (Δ=+0.023)
+- Val token_acc: baseline=0.361, mixed=0.360 (Δ=-0.001)
+- Test perplexity: baseline=46.925, mixed=46.972 (Δ=+0.047)
+- Test token_acc: baseline=0.327, mixed=0.328 (Δ=+0.001)
+- Takeaway: Still parity on CE metrics after longer training; pursue semantic proxy metrics and out-of-domain tests next.
