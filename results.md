@@ -31,3 +31,10 @@ Observations (initial quick run on Wikitext-2 small subset):
 - Train steps: 28 | Epochs: 1.0 | LR: 5e-05 | BS train/eval: 2/2
 - Eval metrics: {"eval_loss": 2.09562087059021, "eval_ce_loss": 3.8456614017486572, "eval_perplexity": 46.78961944580078, "eval_token_acc": 0.3373901284651792, "eval_runtime": 13.052, "eval_samples_per_second": 2.222, "eval_steps_per_second": 1.149, "epoch": 1.0}
 - Test metrics: {"eval_loss": 2.229314088821411, "eval_ce_loss": 4.097716808319092, "eval_perplexity": 60.202674865722656, "eval_token_acc": 0.2942684766214178, "eval_runtime": 13.647, "eval_samples_per_second": 1.905, "eval_steps_per_second": 0.953, "epoch": 1.0}
+
+## Baseline vs Mixed (quick check)
+- Val perplexity: baseline=46.772, mixed=46.790 (Δ=+0.018)
+- Val token_acc: baseline=0.336, mixed=0.337 (Δ=+0.001)
+- Test perplexity: baseline=60.186, mixed=60.203 (Δ=+0.017)
+- Test token_acc: baseline=0.293, mixed=0.294 (Δ=+0.001)
+- Takeaway: On this tiny run, CE metrics are essentially equal; need more data/seeds to conclude.
